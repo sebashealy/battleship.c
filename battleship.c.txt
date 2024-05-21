@@ -1,0 +1,401 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+void llenaTableros(char tablero[10][10]);//funcion para llenar ambos tableros con los barcos necesarios
+void imprime(char tablero[10][10]);//funcion para imprimir el arreglo cuando sea necesario
+void algoritmoBarquitos(char tablero[10][10], int casillas, int numero);
+int numeroBarquitos(char tablero[10][10]);//funcion que cuenta el numero restante de pocisiones
+void turnoJ1(char tablero[10][10], char radar[10][10]);
+void turnoCpu(char tablero[10][10], int *y);
+void imprimeTableroEnemigo(char tablero[10][10]);
+
+int main(void){
+
+  srand(time(0));//la semilla para el uso de generadores aleatorios en el futuro
+  
+  char miTablero[10][10];//el arreglo que vamos a utilizar para el tablero del jugador
+
+  int x;
+  int y;
+  
+  int barcosJ1; //este es el numero de casillas que tienen los jugadores durante la partida, los utilizaremos como contadores para el bucle principal del juego
+  int barcosJ2;
+  
+  char tableroComputadora[10][10];//el tablero de la computadora
+  char intentos[10][10];
+  llenaTableros(intentos);
+
+  llenaTableros(miTablero);
+
+  algoritmoBarquitos(miTablero, 3, 2);
+
+  algoritmoBarquitos(miTablero, 2, 1);
+
+  algoritmoBarquitos(miTablero, 5, 1);
+
+  algoritmoBarquitos(miTablero, 5, 1);
+
+  llenaTableros(tableroComputadora);
+  
+  algoritmoBarquitos(tableroComputadora, 3, 2);
+
+  algoritmoBarquitos(tableroComputadora, 2, 1);
+
+  algoritmoBarquitos(tableroComputadora, 5, 1);
+
+  algoritmoBarquitos(tableroComputadora, 5, 1);
+
+  barcosJ1 = numeroBarquitos(miTablero);
+  barcosJ2 = numeroBarquitos(tableroComputadora);
+  system("clear");
+ 
+  while(barcosJ1 != 0 && barcosJ2 != 0){
+
+    printf("Radar del barco enemigo:\n");
+    imprimeTableroEnemigo(intentos);
+    printf("\nTu tablero:\n");
+    imprime(miTablero);
+
+    printf("Que coordenadas del enemigo quieres atacar: \n");
+    turnoJ1(tableroComputadora, intentos);
+
+    system("clear");
+    
+    printf("Radar del barco enemigo:\n");
+    imprimeTableroEnemigo(intentos);
+    printf("\nTu tablero:\n");
+    imprime(miTablero);
+
+    turnoCpu(miTablero, &y);
+
+  barcosJ1 = numeroBarquitos(miTablero);
+  barcosJ2 = numeroBarquitos(tableroComputadora);
+  system("clear");
+  
+}
+
+  char victoria[15] = "mision cumplida";
+
+  for(x = 0; x <= 15; x++){
+
+    printf("%c", victoria[x]);
+    usleep(10000);
+  }
+  
+  return 0;
+
+}
+
+void llenaTableros(char tablero[10][10]){
+ 
+  //el primer paso es llenarlo de caracteres que representen el oceano, vamos a usar el numero 0
+  //lo hacemos con un simple bucle anidado
+
+  int x; //variable para el uso de bucles
+  int contador;//nuestro contador de barcos colocados, vamos a utilizarlo en los ciclos para contar el numero de barquitos implementados
+  int r;//variable cuando haga falta el uso de la generacion de numeros aleatorios
+  int filas, columnas;// variables que indican valores para filas y columnas dentro de lo que sigue del programa
+  
+  for(filas = 0; filas < 10; filas++){
+    
+    for(columnas = 0; columnas < 10; columnas++){
+
+      tablero[filas][columnas] = '~';
+
+    }
+  }
+
+  //ahora vamos a implementar nuestros barquitos al oceano
+
+  //empecemos con nuestros 2 barquitos de 3 casillas
+
+  //empezamos con un while el cual va a terminar cuando los barcos ya se hayan implementado
+     
+}
+
+void algoritmoBarquitos(char tablero[10][10], int casillas, int numero){
+
+  int x;
+  int contador;
+
+  contador = 0;
+  while(contador < numero){
+  int abajo = 0;
+  int arriba = 0;
+  int izquierda = 0;
+  int derecha = 0;
+
+  int filas = rand() % 10;
+  int columnas = rand() % 10;//randomizamos una fila y una columa entre valores del 0 al 9
+
+  if(tablero[filas][columnas] == '#'){
+    
+    tablero[filas][columnas] == '#';
+    continue;
+  }
+  
+  tablero[filas][columnas] = '#';
+  
+
+    //le asignamos a ese lugar un # simbolizando que hay un barco, pero verificando si no hay ya un barco en es lugar
+
+    for(x = 1; x <= casillas; x++){
+      if(filas + x > 10 || tablero[filas + x][columnas] == '#'){
+      abajo = 1;}
+    }
+    for(x = 1; x <= casillas; x++){
+      if(filas - x < 0 || tablero[filas - x][columnas] == '#'){
+	arriba = 1;}
+    }
+      for(x = 1; x <= casillas; x++){
+        if(columnas + x >= 10 || tablero[filas][columnas + x] == '#'){
+	  derecha = 1;}
+      }
+        for(x = 1; x <= casillas; x++){
+          if(columnas - x < 0 || tablero[filas][columnas - x] == '#'){
+	    izquierda = 1;}
+        }
+	
+    if(abajo == 0){//con esta primera condicional verificamos que dos espacios hacia abajo esten vacios para nuestro barquito de 3 casillas
+      for(x = 1; x <= casillas - 1; x++){
+        tablero[filas + x][columnas] = '#';
+      }
+      contador++;
+    }else if(arriba == 0){//con esta en caso de que los espacios de abajo esten ocupados verificamos hacia arriba
+      for(x = 1; x <= casillas - 1; x++){
+        tablero[filas - x][columnas] = '#';
+      }
+      contador++;
+    }else if(derecha == 0){//y con este en caso de que arriba y abajo no esten libre verificamos hacia la derecha
+      for(x = 1; x <= casillas - 1; x++){
+        tablero[filas][columnas + x] = '#';
+      }
+      contador++;
+    }else if(izquierda == 0){
+       for(x = 1; x <= casillas - 1; x++){
+        tablero[filas][columnas - x] = '#';
+       }
+       contador++;
+    }else if(arriba == 1 && abajo == 1 && izquierda == 1 && derecha == 1){
+
+         tablero[filas][columnas] = '0';
+
+       }
+}
+
+}
+
+
+void imprime(char tablero[10][10]){
+
+  int filas;
+  int columnas;
+  char coordenadasFilas[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+  char punto = 'X';
+  printf(" | ");
+  
+  for(int x = 1; x <= 10; x++){
+    printf("%d ", x);
+  }
+  printf("\n- - ");
+  for(int x = 1; x <= 10; x++){
+    printf("- ");
+  }
+  printf("\n");
+    for(filas = 0; filas < 10; filas++){
+    printf("%c| ", coordenadasFilas[filas]);
+    
+    for(columnas = 0; columnas < 10; columnas++){
+      if(tablero[filas][columnas] == 'X'){
+	printf("\033[1;31m%c \033[0m", tablero[filas][columnas]);
+      }else if(tablero[filas][columnas] == ' '){
+	printf("%c ", punto);
+	}else{printf("%c ", tablero[filas][columnas]);
+	}
+    }printf("\n");
+  }
+}
+
+void imprimeTableroEnemigo(char tablero[10][10]){
+  int filas;
+  int columnas;
+  char coordenadasFilas[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+  char punto = 'X';
+  
+  printf("\033[1;32m | ");
+
+  for(int x = 1; x <= 10; x++){
+    printf("%d ", x);
+  }
+  printf("\n- - ");
+  for(int x = 1; x <= 10; x++){
+    printf("- ");
+  }
+  printf("\n");
+    for(filas = 0; filas < 10; filas++){
+    printf("%c| ", coordenadasFilas[filas]);
+
+    for(columnas = 0; columnas < 10; columnas++){
+      if(tablero[filas][columnas] == 'X'){
+      printf("\033[0m\033[1;31m%c \033[0m\033[1;32m", tablero[filas][columnas]);
+      }else if(tablero[filas][columnas] == ' '){
+	printf("\033[0m%c \033[1;32m", punto);
+      }else{
+	printf("%c ", tablero[filas][columnas]);
+      }
+    }
+      printf("\n");
+    }  
+    printf("\033[0m");
+
+}
+int numeroBarquitos(char tablero[10][10]){
+
+  int barquitos = 0;
+  
+  for(int x = 0; x < 10; x++){
+
+    for(int y = 0; y < 10; y++){
+
+      if(tablero[x][y] == '#'){
+	barquitos++;
+  }
+ 
+}
+  }
+  return barquitos;
+
+}
+
+void turnoJ1(char tablero[10][10], char radar[10][10]){
+  
+  int x, y;
+  char letra;//fila
+  int num;//colimna
+  int fila, columna;
+  
+  char coordenadas[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+  
+  y = 1;
+  
+  while(y == 1){
+    
+  scanf(" %c", &letra);
+  scanf(" %d", &num);
+  
+ 
+  for(x = 0; x < 10; x++){
+
+    if(letra == coordenadas[x]){
+
+      fila = x;
+    }
+  }
+
+  columna = num - 1;
+
+  if(columna >= 0 && columna < 10 && fila < 10 && fila >= 0){
+    y = 0;
+  }else{
+    printf("porfavor ingresa una coordenada valida (fila-columna) por ejemplo: C6\n");
+    y = 1;
+    
+  }
+  }
+  if(tablero[fila][columna] == '#'){
+    radar[fila][columna] = 'X';
+  }else{
+    radar[fila][columna] = ' ';
+  }
+
+  tablero[fila][columna] = '0';
+}
+
+void turnoCpu(char tablero[10][10], int *y){
+
+  int x, z;
+  
+  int fila, columna;
+  int golpe = 0;
+  
+  if(golpe == 1){
+    *y = 2;
+  }
+  
+  if(*y != 1){
+    
+  fila = rand() % 10;
+  columna = rand() % 10;
+ 
+  if(tablero[fila][columna] == '#'){
+   tablero[fila][columna] = 'X';
+   golpe = 1;
+    }else{
+      tablero[fila][columna] = ' ';
+    }
+  }else if(*y == 2){
+    int y = 2;
+    while(y == 2){
+      
+    for(x = 0; x < 10; x++){
+
+      for(z = 0; z < 10; z++){
+
+	if(tablero[x][z] == 'X'){
+
+	  fila = x;
+	  columna = z;
+
+	  if(fila + 1 < 10 && tablero[fila + 1][columna] != 'X'){
+	      if(tablero[fila + 1][columna] == '#'){
+             tablero[fila + 1][columna] = 'X';
+             }else{
+             tablero[fila + 1][columna] = ' ';
+             }
+	      y = 1;
+	      x = 9;
+	      z = 9;
+	  }
+	  else if(fila - 1 >= 0 && tablero[fila - 1][columna] != 'X'){
+
+            if(tablero[fila - 1][columna] == '#'){
+             tablero[fila - 1][columna] = 'X';
+             }else{
+             tablero[fila - 1][columna] = ' ';
+             }
+              y = 1;
+	      x = 9;
+	      z = 9;
+	  }
+	  else if(columna + 1 < 10 && tablero[fila][columna + 1] != 'X'){
+
+	     if(tablero[fila][columna + 1] == '#'){
+             tablero[fila][columna + 1] = 'X';
+             }else{
+             tablero[fila][columna + 1] = ' ';
+             }
+              y = 1;
+	      x = 9;
+	      z = 9;
+	  }
+	  else if(columna - 1 >= 0 && tablero[fila][columna - 1] != 'X'){
+
+	     if(tablero[fila][columna - 1] == '#'){
+             tablero[fila][columna - 1] = 'X';
+             }else{
+             tablero[fila][columna - 1] = ' ';
+             }
+              y = 1;
+	      x = 9;
+	      z = 9;
+ 	  }
+      }
+  }
+  
+    }
+    }
+  }
+}
